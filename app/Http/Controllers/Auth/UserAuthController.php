@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Validator;
+use App\Models\User;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class UserAuthController extends Controller
 {
@@ -49,11 +49,10 @@ class UserAuthController extends Controller
         
         if ($validated->fails()) {
             return response()->json([
-                'error' => $validated->errors()->all(),
+                'errors' => $validated->errors()->all(),
             ], 422);
         }
         $user = User::where('email', $request->email)->first();
-        dd($user);
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
