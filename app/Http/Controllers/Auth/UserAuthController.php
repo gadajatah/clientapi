@@ -14,14 +14,16 @@ class UserAuthController extends Controller
     public function register(Request $request)
     {
         $validated = Validator::make($request->all(), [
-            'name' => 'required',
+            'uid' => 'required',
+            'first_name' => 'required',
             'email' => 'required',
+            'phone' => 'required',
             'password' => 'required'
         ]);
 
         if ($validated->fails()) {
             return response()->json([
-                'message' => 'gagal validate!'
+                'message' => $validated->errors(),
             ], 422);
         }
 
@@ -29,8 +31,10 @@ class UserAuthController extends Controller
         $request['remember_token'] = Str::random(10);
         // $user = User::create($request->toArray());
         $user = new User();
-        $user->name = $request['name'];
+        $user->uid = $request['uid'];
+        $user->first_name = $request['first_name'];
         $user->email = $request['email'];
+        $user->phone = $request['phone'];
         $user->password = $request['password'];
         $user->save();
 
@@ -43,7 +47,7 @@ class UserAuthController extends Controller
     public function login(Request $request)
     {
         $validated = Validator::make($request->all(), [
-            'email' => 'required',
+            'phone' => 'required',
             'password' => 'required',
         ]);
         
@@ -52,7 +56,8 @@ class UserAuthController extends Controller
                 'errors' => $validated->errors()->all(),
             ], 422);
         }
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('phone', $request->phone)->first();
+        // dd($user);
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
